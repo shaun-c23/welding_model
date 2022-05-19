@@ -1,0 +1,92 @@
+*HEADING
+ Thermal analysis of GTAW (SA 516 Grade 70)
+** Units: <mm,N,tonne,s,Celsius>
+**------------------------------------------------
+*PHYSICAL CONSTANTS, ABSOLUTE ZERO=-273.15, STEFAN BOLTZMANN=5.67e-11
+** Stefan Boltzmann constant unit: mW/(mm^2.C^4)
+**------------------------------------------------
+*Material, name=SA516
+*Conductivity
+** Unit: mW/(mm.C)
+60.70815992,70
+60.02324734,100
+58.11379411,200
+55.87226205,300
+53.44393565,400
+51.01560926,500
+48.42124345,600
+46.01367198,700
+43.58534558,800
+41.15701918,900
+38.74944771,1000
+36.15508191,1100
+33.72675551,1200
+31.1323897,1300
+28.37198448,1400
+*Density
+7.861e-09,
+** Unit: tonne/mm^3
+*Latent Heat
+** Unit: mJ/tonne, C, C
+250E9.,1420.,1470.
+*Specific Heat
+** Unit: mJ/(tonne.C)
+431240400,70
+439614000,100
+468921600,200
+489855600,300
+514976400,400
+531723600,500
+552657600,600
+577778400,700
+607086000,800
+640580400,900
+678261600,1000
+711756000,1100
+761997600,1200
+854107200,1300
+1708214400,1400
+**------------------------------------------------
+*INCLUDE, INPUT = geom_info.inp
+*SOLID SECTION, MATERIAL=SA516, ELSET=All
+**---------------------------------------------------------------
+*PARAMETER TABLE TYPE,  NAME="GTAW.Message", PARAMETERS = 1
+ STRING, "Message" 
+*TABLE COLLECTION, NAME="GTAW.TableCollection"
+*PARAMETER TABLE, TYPE= "GTAW.Message"
+"The printing functions require passing a table collection."
+**---------------------------------------------------------------
+*ELEMENT PROGRESSIVE ACTIVATION, NAME="GTAW.weld", ELSET=weld
+**------------------------------------------------
+*INITIAL CONDITIONS,TYPE=TEMPERATURE
+All, 35.
+weld, 1470.
+weldint_1, 35.
+weldint_2, 35.
+** ----------------------------------------------------------------
+** STEP: Beam_Heat
+** 
+*Step, name=Beam_Heat_1, nlgeom=NO, inc=2000000, solver= iterative, unsymm = yes
+*Heat Transfer, end=PERIOD, deltmx=200.
+2e-05, 0.5, 1e-10, 0.001, 
+*Controls, reset
+*Controls, parameters=time incrementation
+, , , , , , , 20, , , 
+*CONTROLS, ANALYSIS = DISCONTINUOUS
+*CONTROLS, PARAMETERS=LINE SEARCH
+5
+*ACTIVATE ELEMENTS,ACTIVATION="GTAW.weld"
+** 
+** LOADS
+** 
+** Name: SURFFLUX-1   Type: Surface heat flux
+*Dsflux, OP = NEW
+Layer1_surf, SNU, 1e+07
+*Sradiate
+Layer1_surf, R, 30., 0.7
+** 
+** OUTPUT REQUESTS
+*Output, field, time interval=0.001
+*Node Output
+NT, 
+*End Step
